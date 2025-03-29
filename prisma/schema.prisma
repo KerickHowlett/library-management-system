@@ -13,9 +13,29 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+model Book {
+    id        String   @id @default(uuid()) @db.Uuid
+    //
+    title     String   @db.VarChar(255)
+    edition   String?  @db.VarChar(50)
+    author    String   @db.VarChar(255) // TODO: support multiple authors
+    genre     String   @db.VarChar(50)
+    //
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
+
+    @@unique(fields: [title, edition, author], name: "unique_book_constraint")
+    @@map("books")
+}
+
 model User {
-    id     String @id @default(cuid())
-    author String @db.VarChar(255) // TODO: support multiple authors
-    genre  String @db.VarChar(50)
-    title  String @db.VarChar(255)
+    id        String   @id @default(uuid()) @db.Uuid
+    //
+    email     String   @unique @db.VarChar(255)
+    fullName  String   @map("full_name") @db.VarChar(255)
+    //
+    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
+    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
+
+    @@map("users")
 }
