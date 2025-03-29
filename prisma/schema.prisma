@@ -14,19 +14,21 @@ datasource db {
 }
 
 model Book {
-    id           String     @id @default(uuid()) @db.Uuid
+    id           String        @id @default(uuid()) @db.Uuid
     //
-    title        String     @db.VarChar(255)
-    edition      String?    @db.VarChar(50)
-    author       String     @db.VarChar(255) // TODO: support multiple authors
-    genre        String     @db.VarChar(50)
-    status       BookStatus @default(OnShelf)
+    title        String        @db.VarChar(255)
+    edition      String?       @db.VarChar(50)
+    author       String        @db.VarChar(255) // TODO: support multiple authors
+    genre        String        @db.VarChar(50)
+    status       BookStatus    @default(OnShelf)
     //
-    createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(0)
-    updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(0)
+    createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(0)
+    updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz(0)
     //
-    userId       String?    @db.Uuid
-    checkedOutBy User?      @relation(fields: [userId], references: [id], map: "checked_out_by")
+    userId       String?       @db.Uuid
+    checkedOutBy User?         @relation(fields: [userId], references: [id], map: "checked_out_by")
+    //
+    Transaction  Transaction[]
 
     @@unique(fields: [title, edition, author], name: "unique_book_constraint")
     @@map("books")
@@ -38,15 +40,37 @@ enum BookStatus {
 }
 
 model User {
-    id        String   @id @default(uuid()) @db.Uuid
+    id          String        @id @default(uuid()) @db.Uuid
     //
-    email     String   @unique @db.VarChar(255)
-    fullName  String   @map("full_name") @db.VarChar(255)
+    email       String        @unique @db.VarChar(255)
+    fullName    String        @map("full_name") @db.VarChar(255)
     //
-    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
-    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
-
-    books Book[]
+    createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz(0)
+    updatedAt   DateTime      @updatedAt @map("updated_at") @db.Timestamptz(0)
+    //
+    books       Book[]
+    Transaction Transaction[]
 
     @@map("users")
+}
+
+model Transaction {
+    id        String            @id @default(uuid()) @db.Uuid
+    //
+    action    TransactionAction
+    timestamp DateTime          @default(now()) @db.Timestamptz(0)
+    //
+    userId    String            @db.Uuid
+    user      User              @relation(fields: [userId], references: [id], map: "transaction_user")
+    //
+    bookId    String            @db.Uuid
+    book      Book              @relation(fields: [bookId], references: [id], map: "transaction_book")
+
+    @@index([timestamp], map: "transaction_timestamp")
+    @@map("transactions")
+}
+
+enum TransactionAction {
+    CheckedOut
+    Returned
 }
