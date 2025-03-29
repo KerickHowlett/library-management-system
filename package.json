@@ -2,12 +2,26 @@
   "name": "@bonterra/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "db:down": "docker compose rm -s -f -v",
+    "db:up": "docker compose up -d",
+    "db:restart": "run-s db:down db:up",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:pull": "prisma db pull",
+    "prisma:studio": "prisma studio",
+    "prisma:update": "run-p prisma:migrate prisma:generate"
+  },
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "@prisma/client": "^6.5.0"
+  },
   "devDependencies": {
     "@nx/js": "20.6.4",
     "@nx/workspace": "20.6.4",
-    "nx": "20.6.4"
+    "npm-run-all": "^4.1.5",
+    "nx": "20.6.4",
+    "prisma": "^6.5.0"
   }
 }
