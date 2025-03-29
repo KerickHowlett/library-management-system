@@ -14,15 +14,18 @@ datasource db {
 }
 
 model Book {
-    id        String   @id @default(uuid()) @db.Uuid
+    id           String   @id @default(uuid()) @db.Uuid
     //
-    title     String   @db.VarChar(255)
-    edition   String?  @db.VarChar(50)
-    author    String   @db.VarChar(255) // TODO: support multiple authors
-    genre     String   @db.VarChar(50)
+    title        String   @db.VarChar(255)
+    edition      String?  @db.VarChar(50)
+    author       String   @db.VarChar(255) // TODO: support multiple authors
+    genre        String   @db.VarChar(50)
     //
-    createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
-    updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
+    createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
+    updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
+    //
+    userId       String?  @db.Uuid
+    checkedOutBy User?    @relation(fields: [userId], references: [id], map: "checked_out_by")
 
     @@unique(fields: [title, edition, author], name: "unique_book_constraint")
     @@map("books")
@@ -36,6 +39,8 @@ model User {
     //
     createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(0)
     updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(0)
+
+    books Book[]
 
     @@map("users")
 }
