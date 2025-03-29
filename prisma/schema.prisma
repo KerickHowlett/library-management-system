@@ -22,7 +22,6 @@ model Book {
     genre        String        @db.VarChar(50)
     series       String?       @db.VarChar(255)
     publisher    String        @db.VarChar(255)
-    status       BookStatus    @default(OnShelf)
     //
     createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(0)
     updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz(0)
@@ -34,11 +33,6 @@ model Book {
 
     @@unique(fields: [title, edition, author], name: "unique_book_constraint")
     @@map("books")
-}
-
-enum BookStatus {
-    CheckedOut
-    OnShelf
 }
 
 model User {
