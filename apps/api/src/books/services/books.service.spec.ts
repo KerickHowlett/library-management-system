@@ -6,6 +6,7 @@ import { faker } from '@faker-js/faker/.';
 import { CreateBookDto, UpdateBookDto } from '../dto';
 import { createBookFixture } from '../../tests/utils';
 import { BOOK_REPOSITORY } from '../repositories/books.repository';
+import { NotFoundException } from '@nestjs/common';
 
 class MockBooksRepository {
     private books = new Map<Book['id'], Book>();
@@ -36,7 +37,8 @@ class MockBooksRepository {
     }
 
     async delete(id: Book['id']) {
-        return this.books.delete(id);
+        this.books.delete(id);
+        return true;
     }
 }
 
@@ -91,7 +93,6 @@ describe('BooksService', () => {
         const book = await service.create(createBookFixture() as CreateBookDto);
         await service.remove(book.id);
 
-        const response = await service.findOne(book.id);
-        expect(response).toBeNull();
+        await expect(service.findOne(book.id)).rejects.toThrow(NotFoundException);
     });
 });
