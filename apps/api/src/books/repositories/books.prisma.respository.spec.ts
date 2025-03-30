@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import { ConfigModule } from '@nestjs/config';
 import { execSync } from 'child_process';
 import path from 'path';
 
@@ -33,7 +32,6 @@ describe('BooksController', () => {
         });
 
         const module: TestingModule = await Test.createTestingModule({
-            imports: [ConfigModule],
             providers: [BooksPrismaRepository, PrismaService],
         }).compile();
 
@@ -80,7 +78,8 @@ describe('BooksController', () => {
         const bookData = createBookFixture() as CreateBookDto;
         const createdBook = await repository.create(bookData);
 
-        await repository.delete(createdBook.id);
+        const isDeleted = await repository.delete(createdBook.id);
+        expect(isDeleted).toEqual(true);
 
         const foundBook = await repository.findById(createdBook.id);
         expect(foundBook).toBeNull();

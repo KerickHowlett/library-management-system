@@ -72,7 +72,17 @@ export class BooksPrismaRepository implements BooksRepository {
         }
     }
 
-    async delete(id: Book['id']): Promise<void> {
-        await this.prismaService.book.delete({ where: { id } });
+    async delete(id: Book['id']): Promise<boolean> {
+        try {
+            await this.prismaService.book.delete({ where: { id } });
+            return true;
+        } catch (error) {
+            // Prisma error code for "Record not found"
+            if (error.code === 'P2025') {
+                this.logger.warn(`Book with ID ${id} not found.`);
+                return false;
+            }
+            throw InternalServerErrorException;
+        }
     }
 }

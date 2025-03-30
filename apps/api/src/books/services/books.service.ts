@@ -2,11 +2,13 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Book } from '@prisma/client';
 
 import { CreateBookDto, UpdateBookDto } from '../dto';
-import { BooksRepository } from '../repositories/books.repository';
+import { BOOK_REPOSITORY, BooksRepository } from '../repositories/books.repository';
+
+const INVALID_BOOK_ID_ERROR = new NotFoundException('invalid book id');
 
 @Injectable()
 export class BooksService {
-    constructor(@Inject('BOOK_REPOSITORY') private readonly booksRepository: BooksRepository) {}
+    constructor(@Inject(BOOK_REPOSITORY) private readonly booksRepository: BooksRepository) {}
 
     async create(dto: CreateBookDto) {
         return await this.booksRepository.create(dto);
@@ -17,22 +19,18 @@ export class BooksService {
     }
 
     async findOne(id: Book['id']) {
-        try {
-            return await this.booksRepository.findById(id);
-        } catch (_) {
-            throw NotFoundException;
-        }
+        const book = await this.booksRepository.findById(id);
+        if (book !== null) return book;
+        throw INVALID_BOOK_ID_ERROR;
     }
 
     async update(id: Book['id'], dto: UpdateBookDto) {
-        try {
-            return await this.booksRepository.update(id, dto);
-        } catch (_) {
-            throw NotFoundException;
-        }
+        return await this.booksRepository.update(id, dto);
     }
 
     async remove(id: Book['id']) {
-        return await this.booksRepository.delete(id);
+        const isDeleted = await this.booksRepository.delete(id);
+        if (isDeleted) return;
+        throw INVALID_BOOK_ID_ERROR;
     }
 }

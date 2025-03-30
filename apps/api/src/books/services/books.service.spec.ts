@@ -5,8 +5,9 @@ import { faker } from '@faker-js/faker/.';
 
 import { CreateBookDto, UpdateBookDto } from '../dto';
 import { createBookFixture } from '../../tests/utils';
+import { BOOK_REPOSITORY } from '../repositories/books.repository';
 
-class FakeBooksRepository {
+class MockBooksRepository {
     private books = new Map<Book['id'], Book>();
 
     async create(dto: CreateBookDto) {
@@ -41,16 +42,10 @@ class FakeBooksRepository {
 
 describe('BooksService', () => {
     let service: BooksService;
-    let fakeBooksRepository: FakeBooksRepository;
 
     beforeEach(async () => {
-        fakeBooksRepository = new FakeBooksRepository();
-
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                BooksService,
-                { provide: 'BOOK_REPOSITORY', useValue: fakeBooksRepository },
-            ],
+            providers: [BooksService, { provide: BOOK_REPOSITORY, useClass: MockBooksRepository }],
         }).compile();
 
         service = module.get<BooksService>(BooksService);
