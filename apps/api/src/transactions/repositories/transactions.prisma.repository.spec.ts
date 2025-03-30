@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import type { User, Book } from '@prisma/client';
+import { type User, type Book, TransactionAction } from '@prisma/client';
 import { execSync } from 'child_process';
 import range from 'lodash/range';
 import path from 'path';
@@ -12,6 +12,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 describe('TransactionsPrismaRepository', () => {
     let users: User[] = [];
     let books: Book[] = [];
+    let prisma: PrismaService;
     let container: StartedPostgreSqlContainer;
     let repository: TransactionsPrismaRepository;
 
@@ -39,9 +40,9 @@ describe('TransactionsPrismaRepository', () => {
             providers: [TransactionsPrismaRepository, PrismaService],
         }).compile();
 
+        prisma = module.get<PrismaService>(PrismaService);
         repository = module.get<TransactionsPrismaRepository>(TransactionsPrismaRepository);
 
-        const prisma = module.get<PrismaService>(PrismaService);
         [books, users] = await prisma.$transaction([
             prisma.book.createManyAndReturn({ data: range(2).map(createBookFixture) }),
             prisma.user.createManyAndReturn({ data: range(2).map(createUserFixture) }),
@@ -61,11 +62,36 @@ describe('TransactionsPrismaRepository', () => {
         expect(repository).toBeDefined();
     });
 
-    it('should create a transaction', async () => {
-        const transactionData = createTransactionFixture(books, users);
-        const createdTransaction = await repository.create(transactionData);
+    describe('creating a transaction', () => {
+        it('should create a checkout transaction', async () => {
+            const transactionData = createTransactionFixture(books, users);
+            const createdTransaction = await repository.create(transactionData);
 
-        expect(createdTransaction).toMatchObject(transactionData);
+            expect(createdTransaction).toMatchObject(transactionData);
+        });
+
+        it('should assign a user id to a book when book is checked out', async () => {
+            const transactionData = createTransactionFixture(books, users);
+            transactionData.action = TransactionAction.CheckedOut;
+
+            await repository.create(transactionData);
+            const book = await prisma.book.findUnique({ where: { id: transactionData.bookId } });
+
+            expect(book.userId).toEqual(transactionData.userId);
+        });
+
+        it('should set user id as null when book is returned', async () => {
+            const transactionData = createTransactionFixture(books, users);
+
+            transactionData.action = TransactionAction.CheckedOut;
+            await repository.create(transactionData);
+
+            transactionData.action = TransactionAction.Returned;
+            await repository.create(transactionData);
+
+            const book = await prisma.book.findUnique({ where: { id: transactionData.bookId } });
+            expect(book.userId).toBeNull();
+        });
     });
 
     it('should find a transaction by ID', async () => {
