@@ -1,31 +1,54 @@
-import type { Book, Prisma } from '@prisma/client';
-import { BadRequestException, Logger, Injectable } from '@nestjs/common';
+import type { Book } from '@prisma/client';
+import {
+    BadRequestException,
+    Logger,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import isEmpty from 'lodash/isEmpty';
 
+import type { CreateBookDto } from '../dto/create-book.dto';
 import { BooksRepository } from './books.repository';
 
 @Injectable()
 export class BooksPrismaRepository implements BooksRepository {
-    private readonly logger = new Logger(BooksPrismaRepository.name);
+    private readonly logger;
 
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService) {
+        this.logger = new Logger(BooksPrismaRepository.name);
+    }
 
     // TODO: Paginate List
     async findAll(): Promise<Book[]> {
-        return await this.prismaService.book.findMany();
+        try {
+            return await this.prismaService.book.findMany();
+        } catch (error) {
+            this.logger.error(error);
+            throw InternalServerErrorException;
+        }
     }
 
     async findById(id: Book['id']): Promise<Book | null> {
         try {
             return await this.prismaService.book.findUniqueOrThrow({ where: { id } });
         } catch (error) {
-            return null;
+            // Prisma error code for "Record not found"
+            if (error.code === 'P2025') {
+                this.logger.warn(`Book with ID ${id} not found.`);
+                return null;
+            }
+            throw InternalServerErrorException;
         }
     }
 
-    async create(book: Prisma.BookCreateInput): Promise<Book> {
-        return await this.prismaService.book.create({ data: book });
+    async create(book: CreateBookDto): Promise<Book> {
+        try {
+            return await this.prismaService.book.create({ data: book });
+        } catch (error) {
+            this.logger.error(error);
+            throw InternalServerErrorException;
+        }
     }
 
     async update(id: Book['id'], book: Partial<Omit<Book, 'id'>>): Promise<Book | null> {
@@ -40,8 +63,12 @@ export class BooksPrismaRepository implements BooksRepository {
                 where: { id },
             });
         } catch (error) {
-            this.logger.error(error);
-            return null;
+            // Prisma error code for "Record not found"
+            if (error.code === 'P2025') {
+                this.logger.warn(`Book with ID ${id} not found.`);
+                return null;
+            }
+            throw InternalServerErrorException;
         }
     }
 
