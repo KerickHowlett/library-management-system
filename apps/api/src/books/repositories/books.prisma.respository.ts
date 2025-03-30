@@ -1,27 +1,51 @@
-import type { Book } from '@prisma/client';
-import type { BooksRepository } from './books.repository';
-import type { PrismaService } from '../../prisma/prisma.service';
+import type { Book, Prisma } from '@prisma/client';
+import { BadRequestException, Logger, Injectable } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import isEmpty from 'lodash/isEmpty';
 
+import { BooksRepository } from './books.repository';
+
+@Injectable()
 export class BooksPrismaRepository implements BooksRepository {
+    private readonly logger = new Logger(BooksPrismaRepository.name);
+
     constructor(private readonly prismaService: PrismaService) {}
 
+    // TODO: Paginate List
     async findAll(): Promise<Book[]> {
-        throw new Error('Method not implemented.');
+        return await this.prismaService.book.findMany();
     }
 
     async findById(id: Book['id']): Promise<Book | null> {
-        throw new Error('Method not implemented.');
+        try {
+            return await this.prismaService.book.findUniqueOrThrow({ where: { id } });
+        } catch (error) {
+            return null;
+        }
     }
 
-    async create(book: Book): Promise<Book> {
-        throw new Error('Method not implemented.');
+    async create(book: Prisma.BookCreateInput): Promise<Book> {
+        return await this.prismaService.book.create({ data: book });
     }
 
-    async update(id: Book['id'], book: Partial<Book>): Promise<Book | null> {
-        throw new Error('Method not implemented.');
+    async update(id: Book['id'], book: Partial<Omit<Book, 'id'>>): Promise<Book | null> {
+        if (isEmpty(book)) {
+            this.logger.warn(`No data was provided: ${id}`);
+            throw BadRequestException;
+        }
+
+        try {
+            return await this.prismaService.book.update({
+                data: book,
+                where: { id },
+            });
+        } catch (error) {
+            this.logger.error(error);
+            return null;
+        }
     }
 
     async delete(id: Book['id']): Promise<void> {
-        throw new Error('Method not implemented.');
+        await this.prismaService.book.delete({ where: { id } });
     }
 }
