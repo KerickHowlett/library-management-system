@@ -6,7 +6,9 @@ import { createBookFixture } from '../../tests/utils';
 import { ConfigModule } from '@nestjs/config';
 import { execSync } from 'child_process';
 import path from 'path';
+
 import { PrismaService } from '../../prisma/prisma.service';
+import type { CreateBookDto } from '../dto';
 
 describe('BooksController', () => {
     let container: StartedPostgreSqlContainer;
@@ -51,14 +53,14 @@ describe('BooksController', () => {
     });
 
     it('should create a book', async () => {
-        const bookData = createBookFixture();
+        const bookData = createBookFixture() as CreateBookDto;
         const createdBook = await repository.create(bookData);
 
         expect(createdBook).toMatchObject(bookData);
     });
 
     it('should find a book by ID', async () => {
-        const bookData = createBookFixture();
+        const bookData = createBookFixture() as CreateBookDto;
         const createdBook = await repository.create(bookData);
 
         const foundBook = await repository.findById(createdBook.id);
@@ -66,7 +68,7 @@ describe('BooksController', () => {
     });
 
     it('should update a book', async () => {
-        const bookData = createBookFixture();
+        const bookData = createBookFixture() as CreateBookDto;
         const createdBook = await repository.create(bookData);
 
         const updatedData = { title: 'Updated Test Book' };
@@ -76,7 +78,7 @@ describe('BooksController', () => {
     });
 
     it('should delete a book', async () => {
-        const bookData = createBookFixture();
+        const bookData = createBookFixture() as CreateBookDto;
         const createdBook = await repository.create(bookData);
 
         await repository.delete(createdBook.id);
@@ -86,10 +88,10 @@ describe('BooksController', () => {
     });
 
     it('should find all books', async () => {
-        const book1 = createBookFixture();
+        const book1 = createBookFixture() as CreateBookDto;
         await repository.create(book1);
 
-        const book2 = createBookFixture();
+        const book2 = createBookFixture() as CreateBookDto;
         await repository.create(book2);
 
         const books = await repository.findAll();
