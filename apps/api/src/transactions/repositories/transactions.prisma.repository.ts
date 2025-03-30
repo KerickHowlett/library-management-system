@@ -20,7 +20,9 @@ export class TransactionsPrismaRepository implements TransactionsRepository {
 
     async findAll(): Promise<Transaction[]> {
         try {
-            return await this.prismaService.transaction.findMany();
+            return await this.prismaService.transaction.findMany({
+                orderBy: { timestamp: 'desc' },
+            });
         } catch (error) {
             this.logger.error(error);
             throw InternalServerErrorException;
