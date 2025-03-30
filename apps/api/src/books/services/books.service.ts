@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import type { Book } from '@prisma/client';
 
 import { CreateBookDto, UpdateBookDto } from '../dto';
@@ -17,11 +17,19 @@ export class BooksService {
     }
 
     async findOne(id: Book['id']) {
-        return await this.booksRepository.findById(id);
+        try {
+            return await this.booksRepository.findById(id);
+        } catch (_) {
+            throw NotFoundException;
+        }
     }
 
     async update(id: Book['id'], dto: UpdateBookDto) {
-        return await this.booksRepository.update(id, dto);
+        try {
+            return await this.booksRepository.update(id, dto);
+        } catch (_) {
+            throw NotFoundException;
+        }
     }
 
     async remove(id: Book['id']) {
