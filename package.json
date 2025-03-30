@@ -26,6 +26,8 @@
         "class-validator": "^0.14.1",
         "lodash": "^4.17.21",
         "lodash-es": "^4.17.21",
+        "react": "19.0.0",
+        "react-dom": "19.0.0",
         "reflect-metadata": "^0.1.13",
         "rxjs": "^7.8.0"
     },
@@ -40,6 +42,7 @@
         "@nx/js": "20.6.4",
         "@nx/nest": "^20.6.4",
         "@nx/node": "20.6.4",
+        "@nx/react": "^20.6.4",
         "@nx/web": "20.6.4",
         "@nx/webpack": "20.6.4",
         "@nx/workspace": "20.6.4",
