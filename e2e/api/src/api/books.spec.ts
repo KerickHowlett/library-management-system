@@ -48,6 +48,7 @@ describe('/api/books', () => {
         expect(updatedBook).toMatchObject({
             ...book,
             title: updateDTO.title,
+            updatedAt: expect.any(String),
         });
     });
 
