@@ -1,11 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import type { Transaction } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { TransactionAction } from '@prisma/client';
 
 import { CreateTransactionDTO } from '../dto';
 import { TransactionsService } from './transactions.service';
-import { createMockTransactionDTO } from '../../tests/utils';
 import { TRANSACTION_REPOSITORY } from '../repositories/transactions.repository';
+import { createMockLibraryActionDTO, createMockTransactionDTO } from '../../tests/utils';
 
 class MockTransactionsRepository {
     private transactions = new Map<Transaction['id'], Transaction>();
@@ -45,28 +46,46 @@ describe('TransactionsService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should create a transaction', async () => {
-        const dto = createMockTransactionDTO();
-        const transaction = await service.create(dto);
+    it('should checkout a book', async () => {
+        const dto = createMockLibraryActionDTO();
+        const transaction = await service.checkoutBook(dto);
 
-        expect(transaction).toMatchObject(dto);
+        expect(transaction).toMatchObject({
+            ...dto,
+            action: TransactionAction.CheckedOut,
+        });
+    });
+
+    it('should return a book', async () => {
+        const dto = createMockLibraryActionDTO();
+        const transaction = await service.returnBook(dto);
+
+        expect(transaction).toMatchObject({
+            ...dto,
+            action: TransactionAction.Returned,
+        });
     });
 
     it('should find all transactions', async () => {
         const transactions = [createMockTransactionDTO(), createMockTransactionDTO()];
-        transactions.forEach(
-            async (transaction: CreateTransactionDTO) => await service.create(transaction),
-        );
+        for (const transaction of transactions) {
+            await service.checkoutBook(transaction);
+        }
 
         const foundTransactions = await service.findAll();
 
-        expect(foundTransactions).toMatchObject(transactions);
-        expect(transactions).toHaveLength(transactions.length);
-        expect(transactions).toEqual(expect.arrayContaining(transactions));
+        expect(foundTransactions).toHaveLength(transactions.length);
+        expect(foundTransactions).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining(transactions[0]),
+                expect.objectContaining(transactions[1]),
+            ]),
+        );
     });
 
     it('should find a transaction by id', async () => {
-        const transaction = await service.create(createMockTransactionDTO());
+        const dto = createMockLibraryActionDTO();
+        const transaction = await service.checkoutBook(dto);
         const foundTransaction = await service.findOne(transaction.id);
 
         expect(foundTransaction).toEqual(transaction);

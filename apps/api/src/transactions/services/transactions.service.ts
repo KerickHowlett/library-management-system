@@ -1,11 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import type { Transaction } from '@prisma/client';
+import { TransactionAction, type Transaction } from '@prisma/client';
 
 import { CreateTransactionDTO } from '../dto';
 import {
     TRANSACTION_REPOSITORY,
     TransactionsRepository,
 } from '../repositories/transactions.repository';
+import { LibraryActionDTO } from '../dto/library-action.dto';
 
 const INVALID_TRANSACTION_ID_ERROR = new NotFoundException('invalid transaction id');
 
@@ -16,8 +17,11 @@ export class TransactionsService {
         private readonly transactionsRepository: TransactionsRepository,
     ) {}
 
-    async create(dto: CreateTransactionDTO) {
-        return await this.transactionsRepository.create(dto);
+    async checkoutBook(dto: LibraryActionDTO) {
+        return await this.transactionsRepository.create({
+            ...dto,
+            action: TransactionAction.CheckedOut,
+        });
     }
 
     async findAll() {
@@ -28,5 +32,12 @@ export class TransactionsService {
         const transaction = await this.transactionsRepository.findById(id);
         if (transaction !== null) return transaction;
         throw INVALID_TRANSACTION_ID_ERROR;
+    }
+
+    async returnBook(dto: LibraryActionDTO) {
+        return await this.transactionsRepository.create({
+            ...dto,
+            action: TransactionAction.Returned,
+        });
     }
 }
