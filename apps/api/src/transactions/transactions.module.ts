@@ -4,6 +4,7 @@ import { TransactionsService } from './services/transactions.service';
 import { TransactionsPrismaRepository } from './repositories/transactions.prisma.repository';
 import { PrismaService } from '../prisma/prisma.service';
 import { TRANSACTION_REPOSITORY } from './repositories/transactions.repository';
+import { TransactionsController } from './transactions.controller';
 
 @Module({
     providers: [
@@ -14,5 +15,6 @@ import { TRANSACTION_REPOSITORY } from './repositories/transactions.repository';
         },
         PrismaService,
     ],
+    controllers: [TransactionsController],
 })
 export class TransactionsModule {}
