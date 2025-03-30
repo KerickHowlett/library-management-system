@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-
-import { BooksPrismaRepository } from './books.prisma.respository';
-import { createBookFixture } from '../../tests/utils';
 import { ConfigModule } from '@nestjs/config';
 import { execSync } from 'child_process';
 import path from 'path';
 
+import { BooksPrismaRepository } from './books.prisma.respository';
+import { createBookFixture } from '../../tests/utils';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { CreateBookDto } from '../dto';
 
