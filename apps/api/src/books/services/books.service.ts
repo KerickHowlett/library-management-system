@@ -1,26 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { CreateBookDto } from '../dto/create-book.dto';
-import { UpdateBookDto } from '../dto/update-book.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import type { Book } from '@prisma/client';
+
+import { CreateBookDto, UpdateBookDto } from '../dto';
+import { BooksRepository } from '../repositories/books.repository';
 
 @Injectable()
 export class BooksService {
-    create(createBookDto: CreateBookDto) {
-        return 'This action adds a new book';
+    constructor(@Inject('BOOK_REPOSITORY') private readonly booksRepository: BooksRepository) {}
+
+    async create(dto: CreateBookDto) {
+        return await this.booksRepository.create(dto);
     }
 
-    findAll() {
-        return `This action returns all books`;
+    async findAll() {
+        return await this.booksRepository.findAll();
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} book`;
+    async findOne(id: Book['id']) {
+        return await this.booksRepository.findById(id);
     }
 
-    update(id: number, updateBookDto: UpdateBookDto) {
-        return `This action updates a #${id} book`;
+    async update(id: Book['id'], dto: UpdateBookDto) {
+        return await this.booksRepository.update(id, dto);
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} book`;
+    async remove(id: Book['id']) {
+        return await this.booksRepository.delete(id);
     }
 }
