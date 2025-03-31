@@ -2,6 +2,7 @@ import type { Book } from '@prisma/client';
 import axios, { HttpStatusCode } from 'axios';
 import isEmpty from 'lodash-es/isEmpty';
 import { useQuery } from 'react-query';
+import LoadSpinner from '../../shared/ui/LoadSpinner/LoadSpinner';
 
 const BooksList = () => {
     const query = useQuery<Book[]>({
@@ -20,7 +21,7 @@ const BooksList = () => {
     });
 
     if (query.isLoading) {
-        return <p>Loading...</p>;
+        return <LoadSpinner label="Loading Books..." />;
     }
 
     if (query.isError) {

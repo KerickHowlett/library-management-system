@@ -17,7 +17,7 @@ describe('BookList', () => {
 
         it('should display loading message', async () => {
             renderWithQueryClient(<BooksList />);
-            expect(screen.queryByText(/Loading.../i)).toBeInTheDocument();
+            expect(screen.queryByTestId('load-spinner')).toBeInTheDocument();
             expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
@@ -33,7 +33,7 @@ describe('BookList', () => {
             await waitFor(() => {
                 expect(screen.queryByText(/An Error has occurred:/i)).toBeInTheDocument();
             });
-            expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
         });
@@ -48,7 +48,7 @@ describe('BookList', () => {
             await waitFor(() => {
                 expect(screen.queryByText(/No Books Found/i)).toBeInTheDocument();
             });
-            expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
         });
@@ -63,7 +63,7 @@ describe('BookList', () => {
             await waitFor(() => {
                 expect(screen.queryByText(/Total Books Found: 5/i)).toBeInTheDocument();
             });
-            expect(screen.queryByText(/Loading.../i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
         });
