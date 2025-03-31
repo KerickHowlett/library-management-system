@@ -18,7 +18,7 @@ describe('BookList', () => {
         it('should display loading message', async () => {
             renderWithQueryClient(<BooksList />);
             expect(screen.queryByTestId('load-spinner')).toBeInTheDocument();
-            expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
         });
@@ -31,7 +31,7 @@ describe('BookList', () => {
         it('should display error message', async () => {
             renderWithQueryClient(<BooksList />);
             await waitFor(() => {
-                expect(screen.queryByText(/An Error has occurred:/i)).toBeInTheDocument();
+                expect(screen.queryByTestId('error-view')).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
@@ -49,7 +49,7 @@ describe('BookList', () => {
                 expect(screen.queryByText(/No Books Found/i)).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
-            expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
             expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
         });
     });
@@ -64,7 +64,7 @@ describe('BookList', () => {
                 expect(screen.queryByText(/Total Books Found: 5/i)).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
-            expect(screen.queryByText(/An Error has occurred:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
             expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
         });
     });
