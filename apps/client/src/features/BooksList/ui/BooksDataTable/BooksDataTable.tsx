@@ -4,7 +4,6 @@ import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
 import SelectUser from '../SelectUser';
 
 import './BooksDataTable.css';
-import { useMemo } from 'react';
 import axios, { HttpStatusCode } from 'axios';
 import { useQuery } from 'react-query';
 
@@ -44,9 +43,6 @@ export default function BooksDataTable({ books }: BooksDataTableProps) {
             }
         },
     });
-
-    console.dir(books[0]);
-    console.dir(query.data?.[0]);
 
     const COLUMN_DEFS: ColDef<Book>[] = [
         { field: 'title', sort: 'asc' },
