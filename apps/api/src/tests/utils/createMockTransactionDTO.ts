@@ -1,9 +1,8 @@
-import type { Book, User } from '@prisma/client';
-
-import { createBookFixture } from './createBookFixture';
-import { createTransactionFixture } from './createTransactionFixture';
-import { createUserFixture } from './createUserFixture';
+import { faker } from '@faker-js/faker/.';
 
 export function createMockTransactionDTO() {
-    return createTransactionFixture([createBookFixture() as Book], [createUserFixture() as User]);
+    return {
+        bookId: faker.string.uuid(),
+        userId: faker.string.uuid(),
+    };
 }

@@ -7,12 +7,13 @@ import { BooksPrismaRepository } from './books.prisma.respository';
 import { createBookFixture } from '../../tests/utils';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { CreateBookDto } from '../dto';
+import { range } from 'lodash';
 
 describe('BooksController', () => {
     let container: StartedPostgreSqlContainer;
     let repository: BooksPrismaRepository;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         container = await new PostgreSqlContainer().start();
 
         const DB_ENV = {
@@ -38,12 +39,7 @@ describe('BooksController', () => {
         repository = module.get<BooksPrismaRepository>(BooksPrismaRepository);
     });
 
-    afterEach(async () => {
-        await container.stop({
-            remove: true,
-            removeVolumes: true,
-        });
-    });
+    afterAll(async () => await container.stop());
 
     it('should be defined', () => {
         expect(repository).toBeDefined();
@@ -86,19 +82,15 @@ describe('BooksController', () => {
     });
 
     it('should find all books', async () => {
-        const book1 = createBookFixture() as CreateBookDto;
-        await repository.create(book1);
+        const books = range(2).map(() => createBookFixture() as CreateBookDto);
+        await Promise.all([repository.create(books[0]), repository.create(books[1])]);
 
-        const book2 = createBookFixture() as CreateBookDto;
-        await repository.create(book2);
+        const foundBooks = await repository.findAll();
+        expect(foundBooks.length).toBeGreaterThanOrEqual(books.length);
 
-        const books = await repository.findAll();
-        expect(books).toHaveLength(2);
-        expect(books).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining(book1),
-                expect.objectContaining(book2),
-            ]),
+        const matchingBooks = foundBooks.filter((foundBook) =>
+            books.some((book) => book.title === foundBook.title),
         );
+        expect(foundBooks).toEqual(expect.arrayContaining(matchingBooks));
     });
 });

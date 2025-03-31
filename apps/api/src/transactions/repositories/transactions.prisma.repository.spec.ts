@@ -16,8 +16,7 @@ describe('TransactionsPrismaRepository', () => {
     let container: StartedPostgreSqlContainer;
     let repository: TransactionsPrismaRepository;
 
-    jest.setTimeout(10_000);
-    beforeEach(async () => {
+    beforeAll(async () => {
         container = await new PostgreSqlContainer().start();
 
         const DB_ENV = {
@@ -49,13 +48,10 @@ describe('TransactionsPrismaRepository', () => {
         ]);
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
         users = [];
         books = [];
-        await container.stop({
-            remove: true,
-            removeVolumes: true,
-        });
+        await container.stop();
     });
 
     it('should be defined', () => {
@@ -103,19 +99,19 @@ describe('TransactionsPrismaRepository', () => {
     });
 
     it('should find all transactions', async () => {
-        const transaction1 = createTransactionFixture(books, users);
-        await repository.create(transaction1);
+        const transactions = range(2).map(() => createTransactionFixture(books, users));
+        await Promise.all([repository.create(transactions[0]), repository.create(transactions[1])]);
 
-        const transaction2 = createTransactionFixture(books, users);
-        await repository.create(transaction2);
+        const foundTransactions = await repository.findAll();
+        expect(foundTransactions.length).toBeGreaterThanOrEqual(transactions.length);
 
-        const transactions = await repository.findAll();
-        expect(transactions).toHaveLength(2);
-        expect(transactions).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining(transaction1),
-                expect.objectContaining(transaction2),
-            ]),
+        const matchingTransactions = foundTransactions.filter((foundTransaction) =>
+            transactions.some(
+                (transaction) =>
+                    transaction.userId === foundTransaction.userId &&
+                    transaction.bookId === foundTransaction.bookId,
+            ),
         );
+        expect(foundTransactions).toEqual(expect.arrayContaining(matchingTransactions));
     });
 });

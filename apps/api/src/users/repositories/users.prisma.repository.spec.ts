@@ -6,12 +6,14 @@ import path from 'path';
 import { UsersPrismaRepository } from './users.prisma.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { CreateUserDto } from '../dto';
+import { range } from 'lodash';
+import { faker } from '@faker-js/faker/.';
 
 describe('UsersPrismaRepository', () => {
-    let container: StartedPostgreSqlContainer;
     let repository: UsersPrismaRepository;
+    let container: StartedPostgreSqlContainer;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         container = await new PostgreSqlContainer().start();
 
         const DB_ENV = {
@@ -37,12 +39,7 @@ describe('UsersPrismaRepository', () => {
         repository = module.get<UsersPrismaRepository>(UsersPrismaRepository);
     });
 
-    afterEach(async () => {
-        await container.stop({
-            remove: true,
-            removeVolumes: true,
-        });
-    });
+    afterAll(async () => await container.stop());
 
     it('should be defined', () => {
         expect(repository).toBeDefined();
@@ -50,8 +47,8 @@ describe('UsersPrismaRepository', () => {
 
     it('should create a user', async () => {
         const userData: CreateUserDto = {
-            email: 'test@example.com',
-            fullName: 'Test User',
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
         };
         const createdUser = await repository.create(userData);
 
@@ -60,8 +57,8 @@ describe('UsersPrismaRepository', () => {
 
     it('should find a user by ID', async () => {
         const userData: CreateUserDto = {
-            email: 'test@example.com',
-            fullName: 'Test User',
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
         };
         const createdUser = await repository.create(userData);
 
@@ -71,8 +68,8 @@ describe('UsersPrismaRepository', () => {
 
     it('should update a user', async () => {
         const userData: CreateUserDto = {
-            email: 'test@example.com',
-            fullName: 'Test User',
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
         };
         const createdUser = await repository.create(userData);
 
@@ -84,8 +81,8 @@ describe('UsersPrismaRepository', () => {
 
     it('should delete a user', async () => {
         const userData: CreateUserDto = {
-            email: 'test@example.com',
-            fullName: 'Test User',
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
         };
         const createdUser = await repository.create(userData);
 
@@ -97,25 +94,22 @@ describe('UsersPrismaRepository', () => {
     });
 
     it('should find all users', async () => {
-        const user1: CreateUserDto = {
-            email: 'user1@example.com',
-            fullName: 'User One',
-        };
-        await repository.create(user1);
+        const users = range(2).map(() => ({
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
+        }));
 
-        const user2: CreateUserDto = {
-            email: 'user2@example.com',
-            fullName: 'User Two',
-        };
-        await repository.create(user2);
+        await repository.create(users[0]);
+        await repository.create(users[1]);
 
-        const users = await repository.findAll();
-        expect(users).toHaveLength(2);
-        expect(users).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining(user1),
-                expect.objectContaining(user2),
-            ]),
+        const foundUsers = await repository.findAll();
+        expect(foundUsers.length).toBeGreaterThanOrEqual(users.length);
+
+        const matchingUsers = foundUsers.filter((user) =>
+            users.some((u) => u.email === user.email),
+        );
+        expect(matchingUsers).toEqual(
+            expect.arrayContaining(users.map((user) => expect.objectContaining(user))),
         );
     });
 });

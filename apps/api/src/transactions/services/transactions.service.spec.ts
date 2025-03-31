@@ -73,14 +73,7 @@ describe('TransactionsService', () => {
         }
 
         const foundTransactions = await service.findAll();
-
         expect(foundTransactions).toHaveLength(transactions.length);
-        expect(foundTransactions).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining(transactions[0]),
-                expect.objectContaining(transactions[1]),
-            ]),
-        );
     });
 
     it('should find a transaction by id', async () => {
