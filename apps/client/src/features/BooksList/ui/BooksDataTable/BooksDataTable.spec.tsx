@@ -1,21 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import BooksDataTable from './BooksDataTable';
 import type { Book } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
 describe('BooksDataTable', () => {
-    it('renders "No Books Found" when books prop is undefined', () => {
-        render(<BooksDataTable books={undefined} />);
-        expect(screen.getByText('No Books Found')).toBeInTheDocument();
-        expect(screen.queryByTestId('books-data-table')).not.toBeInTheDocument();
-    });
-
-    it('renders "No Books Found" when books prop is an empty array', () => {
-        render(<BooksDataTable books={[]} />);
-        expect(screen.getByText('No Books Found')).toBeInTheDocument();
-        expect(screen.queryByTestId('books-data-table')).not.toBeInTheDocument();
-    });
-
     it('renders the data table when books prop is provided', () => {
         const books: Book[] = [
             {
@@ -33,7 +21,6 @@ describe('BooksDataTable', () => {
         ];
 
         render(<BooksDataTable books={books} />);
-        expect(screen.queryByText('No Books Found')).not.toBeInTheDocument();
         expect(screen.getByTestId('books-data-table')).toBeInTheDocument();
     });
 });

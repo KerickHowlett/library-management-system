@@ -19,8 +19,8 @@ describe('BookList', () => {
             renderWithQueryClient(<BooksList />);
             expect(screen.queryByTestId('load-spinner')).toBeInTheDocument();
             expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
-            expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('no-books-view')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('books-data-table')).not.toBeInTheDocument();
         });
     });
 
@@ -34,8 +34,8 @@ describe('BookList', () => {
                 expect(screen.queryByTestId('error-view')).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
-            expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('no-books-view')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('books-data-table')).not.toBeInTheDocument();
         });
     });
 
@@ -46,11 +46,11 @@ describe('BookList', () => {
         it('should display 404 message', async () => {
             renderWithQueryClient(<BooksList />);
             await waitFor(() => {
-                expect(screen.queryByText(/No Books Found/i)).toBeInTheDocument();
+                expect(screen.queryByTestId('no-books-view')).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
-            expect(screen.queryByText(/Total Books Found:/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('books-data-table')).not.toBeInTheDocument();
         });
     });
 
@@ -61,11 +61,11 @@ describe('BookList', () => {
         it('should display total book count', async () => {
             renderWithQueryClient(<BooksList />);
             await waitFor(() => {
-                expect(screen.queryByText(/Total Books Found: 5/i)).toBeInTheDocument();
+                expect(screen.queryByTestId('books-data-table')).toBeInTheDocument();
             });
             expect(screen.queryByTestId('load-spinner')).not.toBeInTheDocument();
             expect(screen.queryByTestId('error-view')).not.toBeInTheDocument();
-            expect(screen.queryByText(/No Books Found/i)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('no-books-view')).not.toBeInTheDocument();
         });
     });
 });

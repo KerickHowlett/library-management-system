@@ -1,12 +1,11 @@
 import type { Book } from '@prisma/client';
 import { type ColDef, themeMaterial, ClientSideRowModelModule } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import isEmpty from 'lodash-es/isEmpty';
 
 import './BooksDataTable.css';
 
 type BooksDataTableProps = {
-    books: Book[] | undefined;
+    books: Book[];
 };
 
 const COLUMN_DEFS: ColDef[] = [{ field: 'title' }, { field: 'author' }, { field: 'genre' }];
@@ -28,10 +27,6 @@ const theme = themeMaterial.withParams({
 });
 
 export default function BooksDataTable({ books }: BooksDataTableProps) {
-    if (isEmpty(books)) {
-        return <p>No Books Found</p>;
-    }
-
     return (
         <div className="h-screen py-5" data-testid="books-data-table">
             <div className="h-full w-4/5 mx-auto">
