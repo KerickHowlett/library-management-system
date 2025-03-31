@@ -3,6 +3,11 @@
     "version": "0.0.0",
     "license": "MIT",
     "scripts": {
+        "build": "npx nx run-many --target build",
+        "e2e": "npx nx run api-e2e:e2e",
+        "serve": "npx nx run-many --target serve",
+        "start": "run-s db:restart serve",
+        "test": "npx nx run-many --target test --projects=api,client",
         "db:down": "docker compose rm -s -f -v",
         "db:up": "docker compose up -d",
         "db:restart": "run-s db:down db:up prisma:migrate db:seed",
@@ -12,7 +17,8 @@
         "prisma:migrate": "prisma migrate dev",
         "prisma:pull": "prisma db pull",
         "prisma:studio": "prisma studio",
-        "prisma:update": "run-p prisma:migrate prisma:generate"
+        "prisma:update": "run-p prisma:migrate prisma:generate",
+        "postinstall": "run-s prisma:generate"
     },
     "private": true,
     "dependencies": {
