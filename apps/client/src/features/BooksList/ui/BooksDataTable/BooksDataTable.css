@@ -1,0 +1,3 @@
+.ag-header-cell-text {
+    @apply font-bold text-white text-lg;
+}

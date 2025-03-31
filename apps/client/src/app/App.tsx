@@ -6,7 +6,9 @@ const queryClient = new QueryClient();
 export function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <BooksList />
+            <div className="flex flex-col">
+                <BooksList />
+            </div>
         </QueryClientProvider>
     );
 }

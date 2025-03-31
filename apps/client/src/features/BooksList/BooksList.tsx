@@ -1,9 +1,9 @@
 import type { Book } from '@prisma/client';
 import axios, { AxiosError, HttpStatusCode } from 'axios';
-import isEmpty from 'lodash-es/isEmpty';
 import { useQuery } from 'react-query';
 import LoadSpinner from '../../shared/ui/LoadSpinner/LoadSpinner';
 import ErrorView from '../../shared/ui/ErrorView';
+import BooksDataTable from './ui/BooksDataTable';
 
 const BooksList = () => {
     const query = useQuery<Book[]>({
@@ -30,13 +30,7 @@ const BooksList = () => {
         return <ErrorView label="Error Loading Books" errorMessage={error.message} />;
     }
 
-    if (query.data === undefined || isEmpty(query.data)) {
-        return <p>No Books Found</p>;
-    }
-
-    console.table(query.data);
-
-    return <p>Total Books Found: {query.data.length}</p>;
+    return <BooksDataTable books={query.data} />;
 };
 
 export default BooksList;
