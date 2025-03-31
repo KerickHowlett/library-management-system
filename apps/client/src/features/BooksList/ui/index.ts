@@ -1,4 +1,5 @@
 import BooksDataTable from './BooksDataTable';
-import NoBooksView from './NoBooksView/NoBooksView';
+import NoBooksView from './NoBooksView';
+import SelectUser from './SelectUser';
 
-export { BooksDataTable, NoBooksView };
+export { BooksDataTable, NoBooksView, SelectUser };

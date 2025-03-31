@@ -7,7 +7,7 @@ import LoadSpinner from '../../shared/ui/LoadSpinner/LoadSpinner';
 import ErrorView from '../../shared/ui/ErrorView';
 import { BooksDataTable, NoBooksView } from './ui';
 
-const BooksList = () => {
+export default function BooksList() {
     const query = useQuery<Book[]>({
         queryKey: ['booksListData'],
         queryFn: async () => {
@@ -37,6 +37,4 @@ const BooksList = () => {
     }
 
     return <BooksDataTable books={query.data} />;
-};
-
-export default BooksList;
+}

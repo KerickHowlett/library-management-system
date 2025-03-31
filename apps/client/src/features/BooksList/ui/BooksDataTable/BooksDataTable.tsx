@@ -1,14 +1,17 @@
-import type { Book } from '@prisma/client';
+import type { Book, User } from '@prisma/client';
 import { type ColDef, themeMaterial, ClientSideRowModelModule } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact, CustomCellRendererProps } from 'ag-grid-react';
+import SelectUser from '../SelectUser';
 
 import './BooksDataTable.css';
+import { useMemo } from 'react';
+import axios, { HttpStatusCode } from 'axios';
+import { useQuery } from 'react-query';
 
 type BooksDataTableProps = {
     books: Book[];
 };
 
-const COLUMN_DEFS: ColDef[] = [{ field: 'title' }, { field: 'author' }, { field: 'genre' }];
 const DEFAULT_COL_DEF: ColDef = { flex: 1, minWidth: 100, filter: true };
 
 const theme = themeMaterial.withParams({
@@ -27,6 +30,42 @@ const theme = themeMaterial.withParams({
 });
 
 export default function BooksDataTable({ books }: BooksDataTableProps) {
+    const query = useQuery<User[]>({
+        queryKey: ['usersListData'],
+        queryFn: async () => {
+            try {
+                const { data } = await axios.get<User[]>('/api/users');
+                return data;
+            } catch (error) {
+                const is404Error =
+                    axios.isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound;
+                if (is404Error) return [] as User[];
+                throw error;
+            }
+        },
+    });
+
+    console.dir(books[0]);
+    console.dir(query.data?.[0]);
+
+    const COLUMN_DEFS: ColDef<Book>[] = [
+        { field: 'title', sort: 'asc' },
+        { field: 'author' },
+        {
+            field: 'userId',
+            cellRenderer: ({ data: book }: CustomCellRendererProps<Book>) => {
+                return (
+                    <SelectUser
+                        key={book!.id}
+                        book={book!}
+                        selectedUserId={book!.userId}
+                        users={query.data || []}
+                    />
+                );
+            },
+        },
+    ];
+
     return (
         <div className="h-screen py-5" data-testid="books-data-table">
             <div className="h-full w-4/5 mx-auto">
