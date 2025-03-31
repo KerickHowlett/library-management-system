@@ -21,9 +21,10 @@ The system consists of three main components:
 
 ### Technologies Used
 
-- **Frontend**: React, TailwindCSS and DaisyUI for styling, and React Query for
-state management since React Query is designed to streamline state management for
-resource-focused applications (e.g., Todo Apps).
+- **Frontend**: React, TailwindCSS and DaisyUI for styling, AGGrid for rendering
+the data table, and React Query for handling state management since React Query
+is designed to streamline state management for resource-focused applications
+(e.g., Todo Apps).
 - **Backend**: NestJS -- a Node.js-based backend framework designed for scalability
 by being modular, supporting dependency injection, and uses Express under the hood.
 - **Database**: Prisma for the ORM and PostgreSQL for the database, since a
