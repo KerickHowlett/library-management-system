@@ -3,12 +3,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
-
-const { PORT, HOST } = process.env;
+import path from 'path';
 
 const PROXY = {
     '/api': {
-        target: `http://${HOST}:${PORT}`,
+        changeOrigin: true,
+        target: `${process.env.VITE_API_DOMAIN}/api`,
         rewrite: (path: string) => path.replace(/^\/api/, ''),
     },
 };
@@ -27,6 +27,7 @@ export default defineConfig(() => ({
         proxy: PROXY,
     },
     plugins: [react(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
+    envDir: path.resolve(__dirname, '../../.env'),
     // Uncomment this if you are using workers.
     // worker: {
     //  plugins: [ nxViteTsPaths() ],
