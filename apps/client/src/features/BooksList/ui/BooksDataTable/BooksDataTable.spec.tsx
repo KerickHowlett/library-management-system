@@ -1,10 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import BooksDataTable from './BooksDataTable';
 import type { Book } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { mockServer, renderWithQueryClient } from '../../../../mocks';
 
 describe('BooksDataTable', () => {
-    it('renders the data table when books prop is provided', () => {
+    beforeEach(() => mockServer.listen());
+    afterEach(() => mockServer.close());
+
+    it('should render the data table', () => {
         const books: Book[] = [
             {
                 userId: null,
@@ -20,7 +24,7 @@ describe('BooksDataTable', () => {
             },
         ];
 
-        render(<BooksDataTable books={books} />);
+        renderWithQueryClient(<BooksDataTable books={books} />);
         expect(screen.getByTestId('books-data-table')).toBeInTheDocument();
     });
 });

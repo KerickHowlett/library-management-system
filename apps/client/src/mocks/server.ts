@@ -19,6 +19,14 @@ export const mockServer = setupServer(
             })),
         ),
     ),
+    http.get('/api/users', () =>
+        HttpResponse.json(
+            range(2).map(() => ({
+                email: faker.internet.email(),
+                fullName: faker.person.fullName(),
+            })),
+        ),
+    ),
 );
 
 export const mockErrorServer = setupServer(
