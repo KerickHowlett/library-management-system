@@ -1,3 +1,3 @@
-import BooksDataTable from '../BooksDataTable';
+import NoBooksView from './NoBooksView';
 
-export default BooksDataTable;
+export default NoBooksView;
